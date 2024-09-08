@@ -1,0 +1,2 @@
+- Sep 8th: 
+  - Initial Project & basic frame.
