@@ -30,10 +30,20 @@ def function_statusCheck(data):
 
 
 def function_getOverview():
-    data = requests.get(ADDRESS + "/api/overview?apikey=" + API_KEY, headers=headers).json()
-    status = function_statusCheck(data)
+    response = requests.get(ADDRESS + "/api/overview?apikey=" + API_KEY, headers=headers).json()
+    status = function_statusCheck(response)
     if status is True:
-        # Data
-        return
+        data_set = {
+            "status": response["status"],
+            "panel_version": response["data"]["version"],
+            "specified_daemon_version": response["data"]["specifiedDaemonVersion"],
+            "record_login": response["data"]["record"]["logined"],
+            "record_illegal_access": response["data"]["record"]["illegalAccess"],
+            "record_ban_ips": response["data"]["record"]["banips"],
+            "record_login_failed": response["data"]["record"]["loginFailed"],
+            "remote_available": response["data"]["remoteCount"]["available"],
+            "remote_total": response["data"]["remoteCount"]["total"],
+        }
+        return data_set
     else:
         return status
