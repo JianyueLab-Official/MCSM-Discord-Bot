@@ -34,7 +34,7 @@ def function_getOverview():
     status = function_statusCheck(response)
     if status is True:
         data_set = {
-            "status": response["status"],
+
             "panel_version": response["data"]["version"],
             "specified_daemon_version": response["data"]["specifiedDaemonVersion"],
             "record_login": response["data"]["record"]["logined"],
@@ -47,3 +47,36 @@ def function_getOverview():
         return data_set
     else:
         return status
+
+
+def function_createUser(username: str, password: str, role):
+    request_body = {"username": username, "password": password, "role": role}
+    response = requests.get(ADDRESS + "/api/auth", headers=headers, json=request_body).json()
+    status = function_statusCheck(response)
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "user_uuid": response["data"]["uuid"],
+        }
+        return data_set
+    else:
+        return status
+
+def function_deleteUser(user_uuid):
+    request_body = [user_uuid]
+    response = requests.get(ADDRESS + "/api/auth", headers=headers, json=request_body).json()
+    status = function_statusCheck(response)
+    if status is True:
+        if data["data"] == 'true':
+            data_set = {
+                "status": response["status"],
+                "message": "User has been deleted",
+            }
+        else:
+            data_set = {
+                "status": response["status"],
+                "message": "User has NOT been deleted",
+            }
+        return data_set
+    else:
+        return data
