@@ -12,6 +12,7 @@ headers = {
     "Content-Type": "application/json; charset=UTF-8",
 }
 
+
 def function_statusCheck(data):
     status = data["status"]
     if status == 200:
@@ -65,9 +66,10 @@ def function_getOverview():
 
 
 def function_createUser(username: str, password: str, role: int):
-    request_body = {"username": username, "password": password, "role": role}
-    response = requests.get(ADDRESS + "/api/auth", headers=headers, json=request_body).json()
+    request_body = {"username": username, "password": password, "permission": role}
+    response = requests.post(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
     status = function_statusCheck(response)
+    print(response)
     if status is True:
         data_set = {
             "status": response["status"],
@@ -80,7 +82,7 @@ def function_createUser(username: str, password: str, role: int):
 
 def function_deleteUser(user_uuid):
     request_body = [user_uuid]
-    response = requests.get(ADDRESS + "/api/auth", headers=headers, json=request_body).json()
+    response = requests.get(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
     status = function_statusCheck(response)
     if status is True:
         if data["data"] == 'true':
