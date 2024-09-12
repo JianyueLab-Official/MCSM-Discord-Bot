@@ -12,21 +12,36 @@ headers = {
     "Content-Type": "application/json; charset=UTF-8",
 }
 
-
 def function_statusCheck(data):
     status = data["status"]
-    if status == "200":
+    if status == 200:
         return True
-    elif status == "400":
-        return "(400) Query String Error"
-    elif status == "403":
-        return "(403) Permission Denied"
-    elif status == "404":
-        return "(404) Not Found"
-    elif status == "500":
-        return "(500) Internal Server Error"
+    elif status == 400:
+        data_set = {
+            "status": 400,
+            "message": "(400) Query String Error",
+        }
+    elif status == 403:
+        data_set = {
+            "status": 400,
+            "message": "(400) Query String Error",
+        }
+    elif status == 404:
+        data_set = {
+            "status": 400,
+            "message": "(404) Permission Denied",
+        }
+    elif status == 500:
+        data_set = {
+            "status": 500,
+            "message": "(500) Internal Server Error",
+        }
     else:
-        return "(Unknown) Error"
+        data_set = {
+            "status": 500,
+            "message": "(Bot) Internal Server Error",
+        }
+    return data_set
 
 
 def function_getOverview():
@@ -34,12 +49,12 @@ def function_getOverview():
     status = function_statusCheck(response)
     if status is True:
         data_set = {
-
+            "status": response["status"],
             "panel_version": response["data"]["version"],
             "specified_daemon_version": response["data"]["specifiedDaemonVersion"],
             "record_login": response["data"]["record"]["logined"],
             "record_illegal_access": response["data"]["record"]["illegalAccess"],
-            "record_ban_ips": response["data"]["record"]["banips"],
+            "record_banned_ips": response["data"]["record"]["banips"],
             "record_login_failed": response["data"]["record"]["loginFailed"],
             "remote_available": response["data"]["remoteCount"]["available"],
             "remote_total": response["data"]["remoteCount"]["total"],
@@ -49,7 +64,7 @@ def function_getOverview():
         return status
 
 
-def function_createUser(username: str, password: str, role):
+def function_createUser(username: str, password: str, role: int):
     request_body = {"username": username, "password": password, "role": role}
     response = requests.get(ADDRESS + "/api/auth", headers=headers, json=request_body).json()
     status = function_statusCheck(response)
@@ -61,6 +76,7 @@ def function_createUser(username: str, password: str, role):
         return data_set
     else:
         return status
+
 
 def function_deleteUser(user_uuid):
     request_body = [user_uuid]
