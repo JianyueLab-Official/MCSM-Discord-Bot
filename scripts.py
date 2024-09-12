@@ -15,34 +15,33 @@ headers = {
 
 def function_statusCheck(data):
     status = data["status"]
-    if status == 200:
-        return True
-    elif status == 400:
-        data_set = {
-            "status": 400,
-            "message": "(400) Query String Error",
-        }
-    elif status == 403:
-        data_set = {
-            "status": 400,
-            "message": "(400) Query String Error",
-        }
-    elif status == 404:
-        data_set = {
-            "status": 400,
-            "message": "(404) Permission Denied",
-        }
-    elif status == 500:
-        data_set = {
-            "status": 500,
-            "message": "(500) Internal Server Error",
-        }
-    else:
-        data_set = {
-            "status": 500,
-            "message": "(Bot) Internal Server Error",
-        }
+
+    match status:
+        case 200:
+            return True
+        case 400 | 403:
+            data_set = {
+                "status": 400,
+                "message": "(400) Query String Error",
+            }
+        case 404:
+            data_set = {
+                "status": 400,
+                "message": "(404) Permission Denied",
+            }
+        case 500:
+            data_set = {
+                "status": 500,
+                "message": "(500) Internal Server Error",
+            }
+        case _:
+            data_set = {
+                "status": 500,
+                "message": "(Bot) Internal Server Error",
+            }
+
     return data_set
+
 
 
 def function_getOverview():
