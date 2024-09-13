@@ -31,33 +31,47 @@ async def on_ready():
         print(e)
 
 
+# /overview
 @client.tree.command(name="overview", description="Get overview of your MCSM panel.")
 async def overview(interaction: discord.Interaction):
+    # Send a wait message ("Bot is thinking")
     await interaction.response.defer(ephemeral=True)
+    # Get data from script
     data = function_getOverview()
+    # Check status
     if data["status"] == 200:
-        # response
+        # response - create am embed message
         embed = discord.Embed(
+            # title of embed message
             title="Overview",
+            # Colour of sidebar
             colour=discord.Colour.green(),
+            # Description under the title
             description="The overview of your MCSM panel"
         )
+        # Add fields to the embed message
         embed.add_field(name="Panel Version", value=data["panel_version"])
         embed.add_field(name="Login Suc.", value=data["record_login"])
         embed.add_field(name="Login Failed", value=data["record_login_failed"])
         embed.add_field(name="Illegal Access", value=data["record_illegal_access"])
         embed.add_field(name="Banned IPs", value=data["record_banned_ips"])
         embed.add_field(name="Daemons", value=f"{data["remote_available"]} / {data["remote_total"]}")
+        # response the embed message
         await interaction.followup.send(embed=embed)
         return
+    # if the status is not 200 then just send the error message
     else:
+        # Send the error message
         await interaction.followup.send(f"{data["message"]}")
         return
 
 
+# /create_user [username] [password] [role selection]
 @client.tree.command(name="create_user", description="Add a user to your panel")
+# create choice for role
 @app_commands.choices(
     role=[
+        # name of the choice and value
         app_commands.Choice(name='Admin', value=10),
         app_commands.Choice(name='User', value=1),
         app_commands.Choice(name='Banned User', value=-1),
