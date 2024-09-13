@@ -2,8 +2,9 @@
 
 ## Development
 
-- Install the dependence
+### Run the project
+Make sure you have poetry instaltion before you run this command.
 ```bash
-pip3 install -r requirements.txt
+poetry run src/__init__.py
 ```
 - Copy `.env.sample` to `.env` and fill all the blanks.
