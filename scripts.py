@@ -43,7 +43,6 @@ def function_statusCheck(data):
     return data_set
 
 
-
 def function_getOverview():
     response = requests.get(ADDRESS + "/api/overview?apikey=" + API_KEY, headers=headers).json()
     status = function_statusCheck(response)
@@ -68,7 +67,6 @@ def function_createUser(username: str, password: str, role: int):
     request_body = {"username": username, "password": password, "permission": role}
     response = requests.post(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
     status = function_statusCheck(response)
-    print(response)
     if status is True:
         data_set = {
             "status": response["status"],
@@ -81,10 +79,10 @@ def function_createUser(username: str, password: str, role: int):
 
 def function_deleteUser(user_uuid):
     request_body = [user_uuid]
-    response = requests.get(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
+    data = requests.delete(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
     status = function_statusCheck(response)
     if status is True:
-        if data["data"] == 'true':
+        if data["status"] is True:
             data_set = {
                 "status": response["status"],
                 "message": "User has been deleted",
