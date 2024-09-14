@@ -63,6 +63,10 @@ def function_getOverview():
         return status
 
 
+def function_searchUser():
+    return
+
+
 def function_createUser(username: str, password: str, role: int):
     request_body = {"username": username, "password": password, "permission": role}
     response = requests.post(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
@@ -75,6 +79,10 @@ def function_createUser(username: str, password: str, role: int):
         return data_set
     else:
         return status
+
+
+def function_updateUser():
+    return
 
 
 def function_deleteUser(user_uuid):
@@ -95,3 +103,67 @@ def function_deleteUser(user_uuid):
         return data_set
     else:
         return data
+
+
+def function_instanceList():
+    return
+
+
+def function_instanceDetail():
+    return
+
+
+def function_createInstance():
+    return
+
+
+def function_updateInstance():
+    return
+
+
+def function_deleteInstance():
+    return
+
+
+def function_startInstance():
+    return
+
+
+def function_stopInstance():
+    return
+
+
+def function_restartInstance():
+    return
+
+
+def function_killInstance():
+    return
+
+
+def function_sendCommand():
+    return
+
+
+def function_getOutput():
+    return
+
+
+def function_reinstallInstance():
+    return
+
+
+def function_addNode():
+    return
+
+
+def function_deleteNode():
+    return
+
+
+def function_tryNode():
+    return
+
+
+def function_updateNode():
+    return
