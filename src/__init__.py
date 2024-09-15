@@ -15,7 +15,7 @@ intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents)
 
 # Version information
-BOT_VERSION = '0.0.1'
+BOT_VERSION = '0.1.0'
 BOT_BUILD_TYPE = 'DEV'
 
 
