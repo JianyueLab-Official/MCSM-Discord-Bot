@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 load_dotenv('.env')
 ADDRESS = os.getenv('MCSMANAGER_ADDRESS')
 API_KEY = os.getenv('MCSMANAGER_API_KEY')
+OUTPUT_SIZE = os.getenv('OUT_PUT_SIZE')
 
 headers = {
     "X-Requested-With": "XMLHttpRequest",
@@ -86,6 +87,7 @@ def function_searchUser():
         return data_set
     else:
         return status
+
 
 def function_createUser(username: str, password: str, role: int):
     request_body = {
@@ -218,7 +220,7 @@ def function_updateConfig(uuid, daemon_id):
         return status
 
 
-def function_deleteInstance(daemon_id, uuid, delete_file):
+def function_deleteInstance(uuid, daemon_id, delete_file):
     # only delete once at time
     request_body = {
         "uuids": [
@@ -355,9 +357,9 @@ def function_sendCommand(uuid, daemon_id, command):
         return status
 
 
-def function_getOutput(uuid, daemon_id, size):
+def function_getOutput(uuid, daemon_id):
     response = requests.get(
-        ADDRESS + "/api/protected_instance/outputlog?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id + "&size=" + size,
+        ADDRESS + "/api/protected_instance/outputlog?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id + "&size=" + OUTPUT_SIZE,
         headers=headers,
     ).json()
 
