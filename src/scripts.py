@@ -1,4 +1,6 @@
 import os
+import uuid
+
 import requests
 from dotenv import load_dotenv
 
@@ -44,8 +46,13 @@ def function_statusCheck(data):
 
 
 def function_getOverview():
-    response = requests.get(ADDRESS + "/api/overview?apikey=" + API_KEY, headers=headers).json()
+    response = requests.get(
+        ADDRESS + "/api/overview?apikey=" + API_KEY,
+        headers=headers
+    ).json()
+
     status = function_statusCheck(response)
+
     if status is True:
         data_set = {
             "status": response["status"],
@@ -64,13 +71,37 @@ def function_getOverview():
 
 
 def function_searchUser():
-    return
+    response = requests.get(
+        ADDRESS + "/api/auth/search&apikey=" + API_KEY,
+        headers=headers
+    ).json()
 
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            # data process
+        }
+
+        return data_set
+    else:
+        return status
 
 def function_createUser(username: str, password: str, role: int):
-    request_body = {"username": username, "password": password, "permission": role}
-    response = requests.post(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
+    request_body = {
+        "username": username,
+        "password": password,
+        "permission": role
+    }
+
+    response = requests.post(
+        ADDRESS + "/api/auth?apikey=" + API_KEY,
+        headers=headers,
+        json=request_body
+    ).json()
+
     status = function_statusCheck(response)
+
     if status is True:
         data_set = {
             "status": response["status"],
@@ -81,14 +112,17 @@ def function_createUser(username: str, password: str, role: int):
         return status
 
 
-def function_updateUser():
-    return
-
-
 def function_deleteUser(user_uuid):
     request_body = [user_uuid]
-    response = requests.delete(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
+
+    response = requests.delete(
+        ADDRESS + "/api/auth?apikey=" + API_KEY,
+        headers=headers,
+        json=request_body
+    ).json()
+
     status = function_statusCheck(response)
+
     if status is True:
         if response["status"] is True:
             data_set = {
@@ -264,37 +298,140 @@ def function_stopInstance(uuid, daemon_id):
         return status
 
 
-def function_restartInstance():
-    return
+def function_restartInstance(uuid, daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/protected_instance/restart&apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "uuid": uuid,
+            "time": response["time"],
+            "message": "Instance has been restarted."
+        }
+    else:
+        return status
 
 
-def function_killInstance():
-    return
+def function_killInstance(uuid, daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/protect_instance/kill?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "uuid": uuid,
+            "time": response["time"],
+            "message": "Instance has been killed."
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_sendCommand():
-    return
+def function_sendCommand(uuid, daemon_id, command):
+    response = requests.get(
+        ADDRESS + "/api/protected_instance/command?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id + "&command=" + command,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "uuid": uuid,
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_getOutput():
-    return
+def function_getOutput(uuid, daemon_id, size):
+    response = requests.get(
+        ADDRESS + "/api/protected_instance/outputlog?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id + "&size=" + size,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "data": response["data"],
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_reinstallInstance():
-    return
+def function_addNode(ip, port, remarks, daemon_apikey):
+    request_body = {
+        "ip": ip,
+        "port": port,
+        "remarks": remarks,
+        "apikey": daemon_apikey,
+    }
+
+    response = requests.post(
+        ADDRESS + "/api/service/remote_service?apikey=" + API_KEY,
+        json=request_body,
+        headers=headers
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "data": response["data"],
+            "message": "Node(Daemon) has been added."
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_addNode():
-    return
+def function_deleteNode(daemon_id):
+    response = requests.delete(
+        ADDRESS + "/api/service/remote_service?apikey=" + API_KEY + "&daemonId=" + daemon_id,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "data": response["data"],
+            "message": "Node(Daemon) has been deleted."
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_deleteNode():
-    return
+def function_tryNode(daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/service/link_remote_service?apikey=" + API_KEY + "&uuid=" + daemon_id,
+    ).json()
 
+    status = function_statusCheck(response)
 
-def function_tryNode():
-    return
-
-
-def function_updateNode():
-    return
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "data": response["data"],
+            "message": "Node(Daemon) has been tried."
+        }
+        return data_set
+    else:
+        return status
