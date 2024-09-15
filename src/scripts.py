@@ -87,10 +87,10 @@ def function_updateUser():
 
 def function_deleteUser(user_uuid):
     request_body = [user_uuid]
-    data = requests.delete(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
+    response = requests.delete(ADDRESS + "/api/auth?apikey=" + API_KEY, headers=headers, json=request_body).json()
     status = function_statusCheck(response)
     if status is True:
-        if data["status"] is True:
+        if response["status"] is True:
             data_set = {
                 "status": response["status"],
                 "message": "User has been deleted",
@@ -102,35 +102,166 @@ def function_deleteUser(user_uuid):
             }
         return data_set
     else:
-        return data
+        return status
 
 
 def function_instanceList():
-    return
+    # missing query
+    response = requests.get(
+        ADDRESS + "/api/service/remote_service_instances?apikey=" + API_KEY,
+        headers=headers
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            # data process
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_instanceDetail():
-    return
+def function_instanceDetail(uuid, daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/instance?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id,
+        headers=headers
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            # data process
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_createInstance():
-    return
+def function_createInstance(daemon_id):
+    request_body = {
+        # missing request body
+    }
+
+    response = requests.post(
+        ADDRESS + "/api/instance?apikey=" + API_KEY + "&daemonId=" + daemon_id,
+        headers=headers,
+        json=request_body
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            # data process
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_updateInstance():
-    return
+def function_updateConfig(uuid, daemon_id):
+    request_body = {
+        # missing request body
+    }
+
+    response = requests.put(
+        ADDRESS + "/api/instance?&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
+        headers=headers,
+        json=request_body
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            # missing data process
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_deleteInstance():
-    return
+def function_deleteInstance(daemon_id, uuid, delete_file):
+    # only delete once at time
+    request_body = {
+        "uuids": [
+            uuid
+        ],
+        "deleteFile": delete_file
+    }
+
+    response = requests.delete(
+        ADDRESS + "/api/instance?&apikey=" + API_KEY + "&daemonId=" + daemon_id,
+        headers=headers,
+        json=request_body
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        if response["data"] is True:
+            data_set = {
+                "status": response["status"],
+                "uuid": uuid,
+                "time": response["time"],
+                "message": "Instance has been deleted."
+            }
+
+        else:
+            data_set = {
+                "status": response["status"],
+                "uuid": uuid,
+                "time": response["time"],
+                "message": "Instance has NOT been deleted."
+            }
+
+        return data_set
+
+    else:
+        return status
 
 
-def function_startInstance():
-    return
+def function_startInstance(uuid, daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/protect_instance/open?&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "uuid": uuid,
+            "time": response["time"],
+            "message": "Instance has been started."
+        }
+        return data_set
+    else:
+        return status
 
 
-def function_stopInstance():
-    return
+def function_stopInstance(uuid, daemon_id):
+    response = requests.get(
+        ADDRESS + "/api/protected_instance/stop&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
+        headers=headers,
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "uuid": uuid,
+            "time": response["time"],
+            "message": "Instance has been stopped."
+        }
+        return data_set
+    else:
+        return status
 
 
 def function_restartInstance():
