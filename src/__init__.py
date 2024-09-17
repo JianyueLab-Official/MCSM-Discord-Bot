@@ -212,7 +212,7 @@ async def command(interaction: discord.Interaction, uuid, daemon_id, command: st
     await interaction.response.defer(emphemeral=True)
     command_data = function_sendCommand(uuid, daemon_id, command)
     if command_data["status"] == 200:
-        output_data = function_sendCommand(uuid, daemon_id)
+        output_data = function_getOutput(uuid, daemon_id)
         if output_data["status"] == 200:
             await interaction.followup.send(f"```bash \n {output_data['message']} \n```")
         else:
