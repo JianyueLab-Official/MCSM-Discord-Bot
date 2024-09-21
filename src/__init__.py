@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from scripts import *
 
 # Load environment variables
-load_dotenv('.env')
+load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 
 # Create shortcut
@@ -74,6 +74,7 @@ async def search_user(interaction: discord.Interaction):
     data = function_searchUser()
     if data["status"] == 200:
         # response process
+        return
     else:
         await interaction.followup.send(f"{data['message']}")
     return
@@ -119,6 +120,7 @@ async def instance_list(interaction: discord.Interaction):
     data = function_instanceList()
     if data["status"] == 200:
         # data process
+        return
     else:
         await interaction.followup.send(f"{data['message']}")
 
@@ -131,6 +133,7 @@ async def create_instance(interaction: discord.Interaction, daemon_id: str):
     data = function_createInstance(daemon_id)
     if  data["status"] == 200:
         # data process
+        return
     else:
         await interaction.followup.send(f"{data['message']}")
     return
@@ -141,6 +144,7 @@ async def update_config(interaction: discord.Interaction, uuid: str, daemon_id: 
     data = function_updateConfig(uuid, daemon_id)
     if data["status"] == 200:
         # data proces
+        return
     else:
         await interaction.followup.send(f"{data['message']}")
     return
