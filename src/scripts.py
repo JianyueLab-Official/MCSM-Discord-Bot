@@ -1,20 +1,22 @@
 import os
-import uuid
 
 import requests
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv('.env')
+load_dotenv()
 ADDRESS = os.getenv('MCSMANAGER_ADDRESS')
 API_KEY = os.getenv('MCSMANAGER_API_KEY')
 OUTPUT_SIZE = os.getenv('OUT_PUT_SIZE')
+PAGE_SIZE = os.getenv('PAGE_SIZE')
+PAGE = os.getenv('PAGE')
 
 headers = {
     "X-Requested-With": "XMLHttpRequest",
     "Content-Type": "application/json; charset=UTF-8",
 }
 
+PAGE_SIZE_PAGE = f"&pageSize={PAGE_SIZE}&page={PAGE}"
 
 def function_statusCheck(data):
     status = data["status"]
@@ -46,6 +48,27 @@ def function_statusCheck(data):
     return data_set
 
 
+def function_permissionCheck(code):
+    match code:
+        case 10:
+            return "Admin"
+        case 1:
+            return "User"
+        case -1:
+            return "Banned"
+        case _:
+            return "Unknown"
+
+
+def function_trueFalseJudge(data):
+    if data == 'true':
+        return '✅'
+    elif data == 'false':
+        return '❌'
+    else:
+        return None
+
+
 def function_getOverview():
     response = requests.get(
         ADDRESS + "/api/overview?apikey=" + API_KEY,
@@ -71,20 +94,26 @@ def function_getOverview():
         return status
 
 
-def function_searchUser():
+def function_searchUser(username):
     response = requests.get(
-        ADDRESS + "/api/auth/search&apikey=" + API_KEY,
+        ADDRESS + "/api/auth/search&apikey=" + API_KEY + "&username=" + username + PAGE_SIZE_PAGE,
         headers=headers
     ).json()
 
     status = function_statusCheck(response)
 
     if status is True:
-        data_set = {
-            # data process
-        }
-
-        return data_set
+        if response["data"]["data"][0]["uuid"] is not None:
+            data_set = {
+                "status": response["status"],
+                "uuid": response["data"]["data"][0]["uuid"],
+                "username": response["data"]["data"][0]["username"],
+                "permission": function_permissionCheck(response["data"]["data"][0]["permission"]),
+                "registerTime": response["data"]["data"][0]["registerTime"],
+                "loginTime": response["data"]["data"][0]["loginTime"],
+                "2fa": function_trueFalseJudge(response["data"]["data"][0]["open2fa"]),
+            }
+            return data_set
     else:
         return status
 
@@ -141,10 +170,9 @@ def function_deleteUser(user_uuid):
         return status
 
 
-def function_instanceList():
-    # missing query
+def function_instanceList(daemon_id, status):
     response = requests.get(
-        ADDRESS + "/api/service/remote_service_instances?apikey=" + API_KEY,
+        ADDRESS + "/api/service/remote_service_instances?apikey=" + API_KEY + "&status=" + str(status) + "&daemonId=" + str(daemon_id) + PAGE_SIZE_PAGE,
         headers=headers
     ).json()
 
@@ -152,7 +180,8 @@ def function_instanceList():
 
     if status is True:
         data_set = {
-            # data process
+            "status": response["status"],
+            # rest data
         }
         return data_set
     else:
@@ -280,14 +309,13 @@ def function_startInstance(uuid, daemon_id):
         return status
 
 
-def function_stopInstance(uuid, daemon_id):
+def function_stopInstance(uuid: str, daemon_id: str):
     response = requests.get(
         ADDRESS + "/api/protected_instance/stop&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
         headers=headers,
     ).json()
 
-    status = function_statusCheck(response)
-
+    print(API_KEY, ADDRESS)
     if status is True:
         data_set = {
             "status": response["status"],
@@ -315,6 +343,7 @@ def function_restartInstance(uuid, daemon_id):
             "time": response["time"],
             "message": "Instance has been restarted."
         }
+        return data_set
     else:
         return status
 
