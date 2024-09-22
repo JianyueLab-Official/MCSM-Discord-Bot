@@ -18,6 +18,7 @@ headers = {
 
 PAGE_SIZE_PAGE = f"&pageSize={PAGE_SIZE}&page={PAGE}"
 
+
 def function_statusCheck(data):
     status = data["status"]
 
@@ -69,6 +70,18 @@ def function_trueFalseJudge(data):
         return None
 
 
+def function_instanceStatusCheck(data):
+    match data:
+        case 3:
+            return "Running"
+        case 2:
+            return ""
+        case 1:
+            return "Stopped"
+        case _:
+            return "Unknown"
+
+
 def function_getOverview():
     response = requests.get(
         ADDRESS + "/api/overview?apikey=" + API_KEY,
@@ -103,15 +116,15 @@ def function_searchUser(username):
     status = function_statusCheck(response)
 
     if status is True:
-        if response["data"]["data"][0]["uuid"] is not None:
+        if response["data"]["data"]["uuid"] is not None:
             data_set = {
                 "status": response["status"],
-                "uuid": response["data"]["data"][0]["uuid"],
-                "username": response["data"]["data"][0]["username"],
-                "permission": function_permissionCheck(response["data"]["data"][0]["permission"]),
-                "registerTime": response["data"]["data"][0]["registerTime"],
-                "loginTime": response["data"]["data"][0]["loginTime"],
-                "2fa": function_trueFalseJudge(response["data"]["data"][0]["open2fa"]),
+                "uuid": response["data"]["data"]["uuid"],
+                "username": response["data"]["data"]["username"],
+                "permission": function_permissionCheck(response["data"]["data"]["permission"]),
+                "registerTime": response["data"]["data"]["registerTime"],
+                "loginTime": response["data"]["data"]["loginTime"],
+                "2fa": function_trueFalseJudge(response["data"]["data"]["open2fa"]),
             }
             return data_set
     else:
@@ -181,7 +194,8 @@ def function_instanceList(daemon_id, status):
     if status is True:
         data_set = {
             "status": response["status"],
-            # rest data
+            "uuid": response["data"]["data"]["instanceUuid"],
+            "instance_status": function_instanceStatusCheck(response["data"]["data"]["status"]),
         }
         return data_set
     else:
@@ -198,7 +212,12 @@ def function_instanceDetail(uuid, daemon_id):
 
     if status is True:
         data_set = {
-            # data process
+            "status": response["status"],
+            "uuid": response["data"]["data"]["instanceUuid"],
+            "instance_status": function_instanceStatusCheck(response["data"]["data"]["status"]),
+            "nickname": response["data"]["config"]["nickname"],
+            "autoStart": function_trueFalseJudge(response["data"]["config"]["eventTask"]["autoStart"]),
+            "autoRestart": function_trueFalseJudge(response["data"]["config"]["eventTask"]["autoRestart"]),
         }
         return data_set
     else:
