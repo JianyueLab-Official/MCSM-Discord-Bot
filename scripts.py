@@ -75,9 +75,13 @@ def function_instanceStatusCheck(data):
         case 3:
             return "Running"
         case 2:
-            return ""
+            return "Starting"
         case 1:
+            return "Stopping"
+        case 0:
             return "Stopped"
+        case -1:
+            return "Maintenance"
         case _:
             return "Unknown"
 

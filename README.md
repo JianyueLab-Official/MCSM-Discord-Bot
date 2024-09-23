@@ -3,8 +3,11 @@
 ## Development
 
 ### Run the project
-Make sure you have poetry instaltion before you run this command.
+
 ```bash
-poetry run python　src/__init__.py
+// install requirements for running bot
+pip3 install -r requirements.txt
+
+python __init__.py
 ```
 - Copy `.env.sample` to `.env` in `/src/` and fill all the blanks.
