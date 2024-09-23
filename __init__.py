@@ -66,15 +66,28 @@ async def overview(interaction: discord.Interaction):
         return
 
 
-# /search_user (unfinished)
+# /search_user [username]
 @client.tree.command(name="search_user", description="Search up a user")
-async def search_user(interaction: discord.Interaction):
+async def search_user(interaction: discord.Interaction, username: str):
     # ephemeral = private
     await interaction.response.defer(ephemeral=True)
-    data = function_searchUser()
+    data = function_searchUser(username)
     if data["status"] == 200:
-        # response process
-        return
+        # Create Embed Message
+        embed = discord.Embed(
+            title="User Information",
+            colour=discord.Colour.purple(),
+            description=f"Detail information about {username}"
+        )
+        embed.add_field(name="UUID", value=data["uuid"])
+        embed.add_field(name="Username", value=data["username"])
+        embed.add_field(name="Role", value=data["permission"])
+        embed.add_field(name="2FA", value=data["2fa"])
+        embed.add_field(name="Login Time", value=data["loginTime"])
+        embed.add_field(name="Register Time", value=data["registerTime"])
+
+        # Send Embed Message
+        await interaction.followup.send(embed=embed)
     else:
         await interaction.followup.send(f"{data['message']}")
     return
@@ -101,7 +114,7 @@ async def create_user(interaction: discord.Interaction, username: str, password:
     return
 
 
-# /delete_user [user_uuid] (unfinished)
+# /delete_user [user_uuid]
 @client.tree.command(name="delete_user", description="Delete exist user on your panel")
 async def delete_user(interaction: discord.Interaction, user_uuid: str):
     await interaction.response.defer(ephemeral=True)
@@ -114,37 +127,24 @@ async def delete_user(interaction: discord.Interaction, user_uuid: str):
         return
 
 
-# /instance_list (unfinished)
-@client.tree.command(name="instance_list", description="List all your instances")
-async def instance_list(interaction: discord.Interaction):
-    data = function_instanceList()
+# /instance_detail [uuid] [daemon_id]
+@client.tree.command(name="instance_detail", description="Check detail of an instance")
+async def instance_detail(interaction: discord.Interaction, uuid: str, daemon_id: str):
+    await interaction.response.defer(ephemeral=True)
+    data = function_instanceDetail(uuid, daemon_id)
     if data["status"] == 200:
-        # data process
-        return
-    else:
-        await interaction.followup.send(f"{data['message']}")
+        embed = discord.Embed(
+            title="Instance Detail",
+            colour=discord.Colour.purple(),
+            description=f"Detail information about {uuid}"
+        )
+        embed.add_field(name="UUID", value=data["uuid"])
+        embed.add_field(name="Status", value=data["instance_status"])
+        embed.add_field(name="Nickname", value=data["nickname"])
+        embed.add_field(name="Auto Start", value=data["autoStart"])
+        embed.add_field(name="Auto Restart", value=data["autoRestart"])
 
-    return
-
-
-# /create_instance [daemon_id] (unfinished)
-@client.tree.command(name="create_instance", description="Create a instance")
-async def create_instance(interaction: discord.Interaction, daemon_id: str):
-    data = function_createInstance(daemon_id)
-    if  data["status"] == 200:
-        # data process
-        return
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /update_config [uuid] [daemon_id] (unfinished)
-async def update_config(interaction: discord.Interaction, uuid: str, daemon_id: str):
-    data = function_updateConfig(uuid, daemon_id)
-    if data["status"] == 200:
-        # data proces
-        return
+        await interaction.followup.send(embed=embed)
     else:
         await interaction.followup.send(f"{data['message']}")
     return
@@ -153,7 +153,7 @@ async def update_config(interaction: discord.Interaction, uuid: str, daemon_id: 
 # /delete_instance [daemon_id] [uuid] [delete_file]
 @client.tree.command(name="delete_instance", description="Delete an instance")
 @app_commands.choices(
-    delete_file = [
+    delete_file=[
         app_commands.Choice(name='true', value=True),
         app_commands.Choice(name='false', value=False),
     ]

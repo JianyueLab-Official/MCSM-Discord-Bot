@@ -18,6 +18,9 @@ headers = {
 
 PAGE_SIZE_PAGE = f"&pageSize={PAGE_SIZE}&page={PAGE}"
 
+instanceData = {}
+daemonData = {}
+
 
 def function_statusCheck(data):
     status = data["status"]
@@ -86,6 +89,10 @@ def function_instanceStatusCheck(data):
             return "Unknown"
 
 
+def function_fetchAllInstance():
+
+
+
 def function_getOverview():
     response = requests.get(
         ADDRESS + "/api/overview?apikey=" + API_KEY,
@@ -130,7 +137,11 @@ def function_searchUser(username):
                 "loginTime": response["data"]["data"]["loginTime"],
                 "2fa": function_trueFalseJudge(response["data"]["data"]["open2fa"]),
             }
-            return data_set
+        else:
+            data_set = {
+                "message": "User not found",
+            }
+        return data_set
     else:
         return status
 
@@ -182,25 +193,6 @@ def function_deleteUser(user_uuid):
                 "status": response["status"],
                 "message": "User has NOT been deleted",
             }
-        return data_set
-    else:
-        return status
-
-
-def function_instanceList(daemon_id, status):
-    response = requests.get(
-        ADDRESS + "/api/service/remote_service_instances?apikey=" + API_KEY + "&status=" + str(status) + "&daemonId=" + str(daemon_id) + PAGE_SIZE_PAGE,
-        headers=headers
-    ).json()
-
-    status = function_statusCheck(response)
-
-    if status is True:
-        data_set = {
-            "status": response["status"],
-            "uuid": response["data"]["data"]["instanceUuid"],
-            "instance_status": function_instanceStatusCheck(response["data"]["data"]["status"]),
-        }
         return data_set
     else:
         return status
