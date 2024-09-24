@@ -1,6 +1,12 @@
 # MCSM - Discord - Bot
 
-## Development
+## Usage & Development
+
+### Requirements:
+
+- Python
+- Discord Bot API
+- MCSM Panel
 
 ### Run the project
 
@@ -10,4 +16,4 @@ pip3 install -r requirements.txt
 
 python __init__.py
 ```
-- Copy `.env.sample` to `.env` in `/src/` and fill all the blanks.
+- Copy `.env.sample` to `.env` and fill all the blanks.
