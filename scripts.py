@@ -238,7 +238,6 @@ def function_instanceDetail(uuid, daemon_id):
         headers=headers
     ).json()
 
-    print(response["data"]["config"]["eventTask"]["autoRestart"])
     status = function_statusCheck(response)
 
     if status is True:
