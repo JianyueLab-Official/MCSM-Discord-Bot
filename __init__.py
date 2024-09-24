@@ -25,6 +25,7 @@ async def on_ready():
     # Try to sync commands
     try:
         synced = await client.tree.sync()
+        function_fetchAllData()
         print(f"Synced {len(synced)} command(s)")
         print('Bot is ready for use!')
     except Exception as e:
@@ -36,7 +37,7 @@ async def on_ready():
 async def overview(interaction: discord.Interaction):
     # Send a wait message ("Bot is thinking"), only the sender can see this message.
     await interaction.response.defer(ephemeral=True)
-    # Get data from script
+    # Get data from script$
     data = function_getOverview()
     # Check status
     if data["status"] == 200:
@@ -44,10 +45,10 @@ async def overview(interaction: discord.Interaction):
         embed = discord.Embed(
             # title of embed message
             title="Overview",
+            # Description under the title
+            description="The overview of your MCSM panel",
             # Colour of sidebar
             colour=discord.Colour.green(),
-            # Description under the title
-            description="The overview of your MCSM panel"
         )
         # Add fields to the embed message
         embed.add_field(name="Panel Version", value=data["panel_version"])
@@ -58,225 +59,106 @@ async def overview(interaction: discord.Interaction):
         embed.add_field(name="Daemons", value=f"{data["remote_available"]} / {data["remote_total"]}")
         # response the embed message
         await interaction.followup.send(embed=embed)
-        return
     # if the status is not 200 then just send the error message
     else:
         # Send the error message
-        await interaction.followup.send(f"{data["message"]}")
-        return
-
-
-# /search_user [username]
-@client.tree.command(name="search_user", description="Search up a user")
-async def search_user(interaction: discord.Interaction, username: str):
-    # ephemeral = private
-    await interaction.response.defer(ephemeral=True)
-    data = function_searchUser(username)
-    if data["status"] == 200:
-        # Create Embed Message
-        embed = discord.Embed(
-            title="User Information",
-            colour=discord.Colour.purple(),
-            description=f"Detail information about {username}"
-        )
-        embed.add_field(name="UUID", value=data["uuid"])
-        embed.add_field(name="Username", value=data["username"])
-        embed.add_field(name="Role", value=data["permission"])
-        embed.add_field(name="2FA", value=data["2fa"])
-        embed.add_field(name="Login Time", value=data["loginTime"])
-        embed.add_field(name="Register Time", value=data["registerTime"])
-
-        # Send Embed Message
-        await interaction.followup.send(embed=embed)
-    else:
-        await interaction.followup.send(f"{data['message']}")
+        await interaction.followup.send(f"Request failed | {data["message"]}")
     return
 
 
-# /create_user [username] [password] [role selection]
-@client.tree.command(name="create_user", description="Add a user to your panel")
-# create choice for role
+# instance (action) [instance_name]
+@client.tree.command(name="instance", description="List all your instance")
+# create choice and value
 @app_commands.choices(
-    role=[
-        # name of the choice and value
-        app_commands.Choice(name='Admin', value=10),
-        app_commands.Choice(name='User', value=1),
-        app_commands.Choice(name='Banned User', value=-1),
+    action=[
+        app_commands.Choice(name="Detail", value=0),
+        # app_commands.Choice(name="List", value=1),
+        app_commands.Choice(name="Start", value=2),
+        app_commands.Choice(name="Stop", value=3),
+        app_commands.Choice(name="Restart", value=4),
     ]
 )
-async def create_user(interaction: discord.Interaction, username: str, password: str, role: app_commands.Choice[int]):
+# function
+async def instance(interaction: discord.Interaction, action: app_commands.Choice[int], instance_name: str):
     await interaction.response.defer(ephemeral=True)
-    data = function_createUser(username, password, role.value)
-    if data["status"] == 200:
-        await interaction.followup.send(f"**User Created Successfully | UUID:** {data["user_uuid"]}")
-    else:
-        await interaction.followup.send(f"{data["message"]}")
-    return
 
+    # check if uuid, daemon_id is not none
+    try:
+        # exchange instance_name to uuid, and daemon_id
+        uuid, daemon_id = function_nameIdTransfer(instance_name)
 
-# /delete_user [user_uuid]
-@client.tree.command(name="delete_user", description="Delete exist user on your panel")
-async def delete_user(interaction: discord.Interaction, user_uuid: str):
-    await interaction.response.defer(ephemeral=True)
-    data = function_deleteUser(user_uuid)
-    if data["status"] == 200:
-        await interaction.followup.send(data["message"])
+        # check action value
+        match action.value:
+            # if value is 0 - Detail
+            case 0:
+                # get data from instance detail
+                data = function_instanceDetail(uuid, daemon_id)
+
+                # create Embed Message
+                embed = discord.Embed(
+                    title="Instance Detail",
+                    description=f"Instance Detail - {instance_name}",
+                    color=discord.Color.purple(),
+                )
+                # add items to Embed Message
+                embed.add_field(name="Status", value=data["instance_status"])
+                embed.add_field(name="Auto Start", value=data["autoStart"])
+                embed.add_field(name="Auto Restart", value=data["autoRestart"])
+                embed.add_field(name="UUID", value=uuid),
+
+                # return Message
+                await interaction.followup.send(embed=embed)
+
+            # if value is 2 - Start
+            case 2:
+                # send request
+                data = function_startInstance(uuid, daemon_id)
+
+                # check the status for the request
+                if data["status"] == 200:
+                    # if instance started, send message
+                    await interaction.followup.send(f"Started {instance_name} | {data["time"]}")
+                else:
+                    # if instance request failed, send error message
+                    await interaction.followup.send(f"Start failed {instance_name} | {data["message"]}")
+
+            # if value is 3 - Stop
+            case 3:
+                # send request
+                data = function_stopInstance(uuid, daemon_id)
+
+                # check the status for the request
+                if data["status"] == 200:
+                    # instance stopped
+                    await interaction.followup.send(f"Stopped {instance_name} | {data["time"]}")
+                else:
+                    # request failed
+                    await interaction.followup.send(f"Stop failed {instance_name} | {data["message"]}")
+
+            # if value is 4 - Restart
+            case 4:
+                # send request
+                data = function_restartInstance(uuid, daemon_id)
+
+                # check request status
+                if data["status"] == 200:
+                    # instance restarted
+                    await interaction.followup.send(f"Restarted {instance_name} | {data["time"]}")
+                else:
+                    # request failed
+                    await interaction.followup.send(f"Restart failed {instance_name} | {data["message"]}")
+
+            # if value is none of above
+            case _:
+                await interaction.followup.send("Value Error")
+
         return
-    else:
-        await interaction.followup.send(f"{data["message"]}")
+
+    except Exception as e:
+        error_message = f"Error {e}"
+        await interaction.followup.send(error_message)
+        print(e)
         return
-
-
-# /instance_detail [uuid] [daemon_id]
-@client.tree.command(name="instance_detail", description="Check detail of an instance")
-async def instance_detail(interaction: discord.Interaction, uuid: str, daemon_id: str):
-    await interaction.response.defer(ephemeral=True)
-    data = function_instanceDetail(uuid, daemon_id)
-    if data["status"] == 200:
-        embed = discord.Embed(
-            title="Instance Detail",
-            colour=discord.Colour.purple(),
-            description=f"Detail information about {uuid}"
-        )
-        embed.add_field(name="UUID", value=data["uuid"])
-        embed.add_field(name="Status", value=data["instance_status"])
-        embed.add_field(name="Nickname", value=data["nickname"])
-        embed.add_field(name="Auto Start", value=data["autoStart"])
-        embed.add_field(name="Auto Restart", value=data["autoRestart"])
-
-        await interaction.followup.send(embed=embed)
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /delete_instance [daemon_id] [uuid] [delete_file]
-@client.tree.command(name="delete_instance", description="Delete an instance")
-@app_commands.choices(
-    delete_file=[
-        app_commands.Choice(name='true', value=True),
-        app_commands.Choice(name='false', value=False),
-    ]
-)
-async def delete_config(interaction: discord.Interaction, uuid: str, daemon_id: str, delete_file: app_commands.Choice[str]):
-    await interaction.response.defer(ephemeral=True)
-    data = function_deleteInstance(uuid, daemon_id, delete_file.value)
-    if data["status"] == 200:
-        await interaction.followup.send(f"{data['message']}, UUID: {uuid}")
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /instance [start / stop / restart] [uuid] [daemon_id]
-@client.tree.command(name="instance", description="Instance control")
-@app_commands.choices(
-    action = [
-        app_commands.Choice(name='Start', value="start"),
-        app_commands.Choice(name='Stop', value="stop"),
-        app_commands.Choice(name='Restart', value="restart"),
-        app_commands.Choice(name='Kill', value='kill')
-    ]
-)
-async def instance(interaction: discord.Interaction, action: app_commands[str], uuid: str, daemon_id: str):
-    await interaction.response.defer(ephemeral=True)
-
-    if action.value == 'start':
-        data = function_startInstance(uuid, daemon_id)
-        if data["status"] == 200:
-            await interaction.followup.send(f"{data['message']}, UUID: {uuid}")
-        else:
-            await interaction.followup.send(f"{data['message']}")
-    elif action.value == 'stop':
-        data = function_stopInstance(uuid, daemon_id)
-        if data["status"] == 200:
-            await interaction.followup.send(f"{data['message']}, UUID: {uuid}")
-        else:
-            await interaction.followup.send(f"{data['message']}")
-    elif action.value == 'restart':
-        data = function_restartInstance(uuid, daemon_id)
-        if data["status"] == 200:
-            await interaction.followup.send(f"{data['message']}, UUID: {uuid}")
-        else:
-            await interaction.followup.send(f"{data['message']}")
-    elif action.value == 'kill':
-        data = function_killInstance(uuid, daemon_id)
-        if data["status"] == 200:
-            await interaction.followup.send(f"{data['message']}, UUID: {uuid}")
-        else:
-            await interaction.followup.send(f"{data['message']}")
-    else:
-        await interaction.followup.send("Invalid Input.")
-    return
-
-
-# /command [uuid] [daemon_id] [command]
-@client.tree.command(name="command", description="Send a command of instance")
-async def command(interaction: discord.Interaction, uuid, daemon_id, command: str):
-    await interaction.response.defer(emphemeral=True)
-    command_data = function_sendCommand(uuid, daemon_id, command)
-    if command_data["status"] == 200:
-        output_data = function_getOutput(uuid, daemon_id)
-        if output_data["status"] == 200:
-            await interaction.followup.send(f"```bash \n {output_data['message']} \n```")
-        else:
-            await interaction.followup.send(f"{output_data['message']}")
-        return
-    else:
-        await interaction.followup.send(f"{command_data['message']}")
-    return
-
-
-# /add_node [ip] [port] [remarks] [daemon_apikey]
-@client.tree.command(name="add_node", description="Add a new Node.")
-async def add_node(interaction: discord.Interaction, ip: str, port: int, remarks: str, daemon_apikey: str):
-    data = function_addNode(ip, port, remarks, daemon_apikey)
-    if data["status"] == 200:
-        await interaction.followup.send(f"{data["message"]} | Daemon Id: {data["data"]}")
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /delete_node [daemon_id]
-@client.tree.command(name="remove_node", description="Remove a Node.")
-async def remove_node(interaction: discord.Interaction, daemon_id: str):
-    await interaction.response.defer(emphemeral=True)
-
-    data = function_deleteNode(daemon_id)
-
-    if data["status"] == 200:
-        await interaction.follow.send(f"{data['message']} | Daemon Id: {data['data']}")
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /try_node [daemon_id]
-@client.tree.command(name="try_instance", description="Try to connect Node")
-async def try_instance(interaction: discord.Interaction, daemon_id: str):
-    await interaction.response.defer(ephemeral=True)
-
-    data = function_tryNode(daemon_id)
-
-    if data["status"] == 200:
-        await interaction.followup.send(f"{data['message']} | {data["data"]}")
-    else:
-        await interaction.followup.send(f"{data['message']}")
-    return
-
-
-# /info
-@client.tree.command(name="info", description="Get information about this bot.")
-async def info(interaction: discord.Interaction):
-    await interaction.response.send_message(
-        "## MCSM-Discord-Bot\n",
-        "This bot was developed by [JianyueLab](https://awa.ms).\n",
-        "**GitHub Repo: ** https://awa.ms/mcsm-discord-bot\n",
-        "**Bot Version: **" + BOT_VERSION,
-        "**Bot Type: **" + BOT_BUILD_TYPE,
-        ephemeral=True,
-    )
 
 
 client.run(DISCORD_TOKEN)

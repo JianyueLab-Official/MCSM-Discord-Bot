@@ -22,6 +22,15 @@ instanceData = {}
 daemonData = {}
 
 
+def function_trueFalseJudge(data):
+    if data is True:
+        return '✅'
+    elif data is False:
+        return '❌'
+    else:
+        return None
+
+
 def function_statusCheck(data):
     status = data["status"]
 
@@ -64,15 +73,6 @@ def function_permissionCheck(code):
             return "Unknown"
 
 
-def function_trueFalseJudge(data):
-    if data == 'true':
-        return '✅'
-    elif data == 'false':
-        return '❌'
-    else:
-        return None
-
-
 def function_instanceStatusCheck(data):
     match data:
         case 3:
@@ -89,7 +89,13 @@ def function_instanceStatusCheck(data):
             return "Unknown"
 
 
-def function_fetchDaemonData():
+def function_nameIdTransfer(instance_name):
+    uuid = instanceData[instance_name]["uuid"]
+    daemon_id = instanceData[instance_name]["daemonId"]
+    return uuid, daemon_id
+
+
+def function_fetchAllData():
     data = requests.get(
         ADDRESS + f"/api/overview?apikey={API_KEY}"
     ).json()
@@ -101,10 +107,6 @@ def function_fetchDaemonData():
         remarks = daemon["remarks"]
         daemonData[remarks] = daemon_uuid
 
-    return
-
-
-def function_fetchInstanceData():
     daemon_ids = daemonData.values()
 
     for daemon_id in daemon_ids:
@@ -118,7 +120,9 @@ def function_fetchInstanceData():
         for instance in instances:
             instance_id = instance["instanceUuid"]
             nickname = instance["config"]["nickname"]
-            instanceData[nickname] = instance_id
+            instanceData[nickname] = {}
+            instanceData[nickname]["uuid"] = instance_id
+            instanceData[nickname]["daemonId"] = daemon_id
 
     return
 
@@ -234,13 +238,14 @@ def function_instanceDetail(uuid, daemon_id):
         headers=headers
     ).json()
 
+    print(response["data"]["config"]["eventTask"]["autoRestart"])
     status = function_statusCheck(response)
 
     if status is True:
         data_set = {
             "status": response["status"],
-            "uuid": response["data"]["data"]["instanceUuid"],
-            "instance_status": function_instanceStatusCheck(response["data"]["data"]["status"]),
+            "uuid": response["data"]["instanceUuid"],
+            "instance_status": function_instanceStatusCheck(response["data"]["status"]),
             "nickname": response["data"]["config"]["nickname"],
             "autoStart": function_trueFalseJudge(response["data"]["config"]["eventTask"]["autoStart"]),
             "autoRestart": function_trueFalseJudge(response["data"]["config"]["eventTask"]["autoRestart"]),
@@ -336,7 +341,7 @@ def function_deleteInstance(uuid, daemon_id, delete_file):
 
 def function_startInstance(uuid, daemon_id):
     response = requests.get(
-        ADDRESS + "/api/protect_instance/open?&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
+        ADDRESS + "/api/protected_instance/open?apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
         headers=headers,
     ).json()
 
@@ -347,7 +352,6 @@ def function_startInstance(uuid, daemon_id):
             "status": response["status"],
             "uuid": uuid,
             "time": response["time"],
-            "message": "Instance has been started."
         }
         return data_set
     else:
@@ -356,11 +360,12 @@ def function_startInstance(uuid, daemon_id):
 
 def function_stopInstance(uuid: str, daemon_id: str):
     response = requests.get(
-        ADDRESS + "/api/protected_instance/stop&apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
+        ADDRESS + "/api/protected_instance/stop?apikey=" + API_KEY + "&daemonId=" + daemon_id + "&uuid=" + uuid,
         headers=headers,
     ).json()
 
-    print(API_KEY, ADDRESS)
+    status = function_statusCheck(response)
+
     if status is True:
         data_set = {
             "status": response["status"],
@@ -375,7 +380,7 @@ def function_stopInstance(uuid: str, daemon_id: str):
 
 def function_restartInstance(uuid, daemon_id):
     response = requests.get(
-        ADDRESS + "/api/protected_instance/restart&apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id,
+        ADDRESS + "/api/protected_instance/restart?apikey=" + API_KEY + "&uuid=" + uuid + "&daemonId=" + daemon_id,
         headers=headers,
     ).json()
 
