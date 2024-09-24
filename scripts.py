@@ -16,7 +16,7 @@ headers = {
     "Content-Type": "application/json; charset=UTF-8",
 }
 
-PAGE_SIZE_PAGE = f"&pageSize={PAGE_SIZE}&page={PAGE}"
+PAGE_SIZE_PAGE = f"&page_size={PAGE_SIZE}&page={PAGE}"
 
 instanceData = {}
 daemonData = {}
@@ -89,8 +89,38 @@ def function_instanceStatusCheck(data):
             return "Unknown"
 
 
-def function_fetchAllInstance():
+def function_fetchDaemonData():
+    data = requests.get(
+        ADDRESS + f"/api/overview?apikey={API_KEY}"
+    ).json()
 
+    daemons = data["data"]["remote"]
+
+    for daemon in daemons:
+        daemon_uuid = daemon["uuid"]
+        remarks = daemon["remarks"]
+        daemonData[remarks] = daemon_uuid
+
+    return
+
+
+def function_fetchInstanceData():
+    daemon_ids = daemonData.values()
+
+    for daemon_id in daemon_ids:
+        data = requests.get(
+            ADDRESS + f"/api/service/remote_service_instances?daemonId={daemon_id}{PAGE_SIZE_PAGE}&status=&instance_name=&apikey={API_KEY}",
+            headers=headers,
+        ).json()
+
+        instances = data["data"]["data"]
+
+        for instance in instances:
+            instance_id = instance["instanceUuid"]
+            nickname = instance["config"]["nickname"]
+            instanceData[nickname] = instance_id
+
+    return
 
 
 def function_getOverview():
