@@ -161,4 +161,23 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
         return
 
 
+# info
+@client.tree.command(name="info", description="Some information about this bot")
+async def info(interaction: discord.Interaction):
+    embed = discord.Embed(
+        title="INFO",
+        description="SOME INFORMATION",
+        colour=discord.Colour.green(),
+    )
+
+    embed.add_field(name="Developer", value="JianyueHugo")
+    embed.add_field(name="Homepage", value="awa.ms")
+    embed.add_field(name="GitHub Repo", value="https://github.com/JianyueLab-Official/MCSM-Discord-Bot", inline=False)
+
+    embed.set_footer(text="Powered by JianyueLab",
+                     icon_url="https://pic.awa.ms/f/1/65ed96d9842a5/65ed96d9842a5.png")
+
+    await interaction.response.send_message(embed=embed)
+    return
+
 client.run(DISCORD_TOKEN)
