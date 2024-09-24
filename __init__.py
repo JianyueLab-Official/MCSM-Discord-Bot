@@ -172,6 +172,7 @@ async def info(interaction: discord.Interaction):
 
     embed.add_field(name="Developer", value="JianyueHugo")
     embed.add_field(name="Homepage", value="awa.ms")
+    embed.add_field(name="LICENSE", value="MIT")
     embed.add_field(name="GitHub Repo", value="https://github.com/JianyueLab-Official/MCSM-Discord-Bot", inline=False)
 
     embed.set_footer(text="Powered by JianyueLab",
