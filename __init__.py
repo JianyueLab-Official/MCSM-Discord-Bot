@@ -15,8 +15,8 @@ intents = discord.Intents.all()
 client = commands.Bot(command_prefix='!', intents=intents)
 
 # Version information
-BOT_VERSION = '0.1.0'
-BOT_BUILD_TYPE = 'Release'
+BOT_VERSION = '0.1.1'
+BOT_BUILD_TYPE = 'Dev'
 
 
 # Start Bot
@@ -76,6 +76,7 @@ async def overview(interaction: discord.Interaction):
         app_commands.Choice(name="Start", value=2),
         app_commands.Choice(name="Stop", value=3),
         app_commands.Choice(name="Restart", value=4),
+        app_commands.Choice(name="Kill", value=5)
     ]
 )
 # function
@@ -148,6 +149,18 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
                     # request failed
                     await interaction.followup.send(f"Restart failed {instance_name} | {data["message"]}")
 
+            # if value is 5 - Kill
+            case 5:
+                # send request
+                data = function_killInstance(uuid, daemon_id)
+
+                # check request status
+                if data["status"] == 200:
+                    # instance killed
+                    await interaction.followup.send(f"Killed {instance_name} | {data["time"]}")
+                else:
+                    await interaction.followup.send(f"Kill failed {instance_name} | {data["message"]}")
+
             # if value is none of above
             case _:
                 await interaction.followup.send("Value Error")
@@ -219,7 +232,6 @@ async def output(interaction: discord.Interaction, instance_name: str):
     return
 
 
-
 # info
 @client.tree.command(name="info", description="Some information about this bot")
 async def info(interaction: discord.Interaction):
@@ -239,7 +251,7 @@ async def info(interaction: discord.Interaction):
     embed.set_footer(text="Powered by JianyueLab",
                      icon_url="https://pic.awa.ms/f/1/65ed96d9842a5/65ed96d9842a5.png")
 
-    await interaction.response.send_message(embed=embed)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
     return
 
 client.run(DISCORD_TOKEN)
