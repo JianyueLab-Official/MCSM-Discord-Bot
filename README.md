@@ -1,5 +1,6 @@
 [![Color logo - no background.png](https://pic.awa.ms/f/1/65ed96d8606e6/65ed96d8606e6.png)](https://awa.ms)
 # MCSM - Discord - Bot
+[![Page Views Count](https://badges.toozhao.com/badges/01J8KJ432RE4DJ7F3VEV67WYT5/blue.svg)](https://badges.toozhao.com/stats/01J8KJ432RE4DJ7F3VEV67WYT5 "Get your own page views count badge on badges.toozhao.com")
 
 ### TO DO LIST:
 
