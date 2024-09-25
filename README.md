@@ -3,6 +3,13 @@
 
 ## Usage & Development
 
+### TO DO LIST:
+
+- [ ] Instance List
+- [ ] User Control
+- [ ] Node Control & Details
+- [ ] etc.
+
 ### Requirements:
 
 - Python
