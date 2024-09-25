@@ -48,6 +48,6 @@ This bot DOES NOT PROVIDE ANY ROLE LIMITATION which EVERYONE in your server will
 ![oauth](/images/oauth1.png)
 ![oauth](/images/oauth2.png)
 
-## Developers
+## Contributors
 
 ![contributors](https://contrib.rocks/image?repo=JianyueLab-Official/MCSM-Discord-Bot)
