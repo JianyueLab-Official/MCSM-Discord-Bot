@@ -16,7 +16,7 @@ client = commands.Bot(command_prefix='!', intents=intents)
 
 # Version information
 BOT_VERSION = '0.1.0'
-BOT_BUILD_TYPE = 'DEV'
+BOT_BUILD_TYPE = 'Release'
 
 
 # Start Bot
@@ -152,13 +152,72 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
             case _:
                 await interaction.followup.send("Value Error")
 
-        return
+    except Exception as e:
+        error_message = f"Error {e}"
+        await interaction.followup.send(error_message)
+        print(e)
+
+    return
+
+
+# command & console
+# command [instance name] [command]
+@client.tree.command(name="command", description="Send a command to your instance")
+async def command(interaction: discord.Interaction, instance_name: str, command: str):
+    await interaction.response.defer(ephemeral=True)
+
+    # try
+    try:
+        uuid, daemon_id = function_nameIdTransfer(instance_name)
+
+        # send command
+        function_sendCommand(uuid, daemon_id, command)
+
+        # get output
+        data = function_getOutput(uuid, daemon_id)
+
+        # send the output
+        await interaction.followup.send(
+            f"""
+            ```bash
+            {data["data"]}
+            ```
+            """
+        )
 
     except Exception as e:
         error_message = f"Error {e}"
         await interaction.followup.send(error_message)
         print(e)
-        return
+
+    return
+
+
+# Get output
+@client.tree.command(name="output", description="Get output of your instance")
+async def output(interaction: discord.Interaction, instance_name: str):
+    await interaction.response.defer(ephemeral=True)
+
+    try:
+        uuid, daemon_id = function_nameIdTransfer(instance_name)
+
+        data = function_getOutput(uuid, daemon_id)
+
+        await interaction.followup.send(
+            f"""
+            ```bash
+            {data["data"]}
+            ```
+            """
+        )
+
+    except Exception as e:
+        error_message = f"Error {e}"
+        await interaction.followup.send(error_message)
+        print(e)
+
+    return
+
 
 
 # info
@@ -174,6 +233,8 @@ async def info(interaction: discord.Interaction):
     embed.add_field(name="Homepage", value="awa.ms")
     embed.add_field(name="LICENSE", value="MIT")
     embed.add_field(name="GitHub Repo", value="https://github.com/JianyueLab-Official/MCSM-Discord-Bot", inline=False)
+    embed.add_field(name="Version", value=BOT_VERSION)
+    embed.add_field(name="Build Type", value=BOT_BUILD_TYPE)
 
     embed.set_footer(text="Powered by JianyueLab",
                      icon_url="https://pic.awa.ms/f/1/65ed96d9842a5/65ed96d9842a5.png")
