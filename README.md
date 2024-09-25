@@ -7,6 +7,7 @@
 - [ ] Instance List
 - [ ] User Control
 - [ ] Node Control & Details
+- [ ] User search
 - [ ] etc.
 
 ## Usage & Development
