@@ -20,7 +20,12 @@ python __init__.py
 
 - Copy `.env.sample` to `.env` and fill all the blanks.
 
-### How to create a discord bot and get api?
+### Important
+
+This bot DOES NOT PROVIDE ANY ROLE LIMITATION which EVERYONE in your server will have PERMISSION to send command. Please limit bot in your server's `server settins` -> `apps` -> `intergrations` -> `your bot name`, select roles and channel that allow for sending commands.
+
+
+## How to create a discord bot and get api?
 1. Go to [Discord Developer Panel](https://discord.com/developers), login your discord account.
 ![discord developer panel](/images/discord_dev_panel.png)
 2. Press button at right-top to create a new bot.
@@ -33,10 +38,6 @@ python __init__.py
 6. Go to oauth page, select `bot` and `Administrator`, then scroll down it will generate you a link. Copy and paste link to the browser.
 ![oauth](/images/oauth1.png)
 ![oauth](/images/oauth2.png)
-
-## Important
-
-This bot DOES NOT PROVIDE ANY ROLE LIMITATION which EVERYONE in your server will have PERMISSION to send command. Please limit bot in your server's `server settins` -> `apps` -> `intergrations` -> `your bot name`, select roles and channel that allow for sending commands.
 
 ## Developers
 
