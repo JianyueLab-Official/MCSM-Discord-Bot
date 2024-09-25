@@ -18,6 +18,8 @@
 
 ### Run the project
 
+- Download codes from [release page](https://github.com/JianyueLab-Official/MCSM-Discord-Bot/releases).
+
 ```bash
 // install requirements for running bot
 pip3 install -r requirements.txt
