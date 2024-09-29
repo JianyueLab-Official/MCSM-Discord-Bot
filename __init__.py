@@ -32,6 +32,24 @@ async def on_ready():
         print(e)
 
 
+# Manual Update Information
+# /update
+@client.tree.command(name="update", description="Update the data dict for your web panel.")
+async def update(interaction: discord.Interaction):
+    # send defer message, and hide the message only for the person who send the message.
+    await interaction.response.defer(ephemeral=True)
+
+    try:
+        function_fetchAllData()
+        await interaction.followup.send("Data Dict Update Successfully")
+
+    except Exception as e:
+        print(e)
+        await interaction.followup.send(f"Data Dict Update Failed | {e}")
+
+    return
+
+
 # /overview
 @client.tree.command(name="overview", description="Get overview of your MCSM panel.")
 async def overview(interaction: discord.Interaction):
