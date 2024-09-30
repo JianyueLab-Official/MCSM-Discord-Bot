@@ -37,6 +37,32 @@ python __init__.py
 
 This bot DOES NOT PROVIDE ANY ROLE LIMITATION which EVERYONE in your server will have PERMISSION to send command. Please limit bot in your server's `server settins` -> `apps` -> `intergrations` -> `your bot name`, select roles and channel that allow for sending commands.
 
+### Environment Settings
+#### `DISCORD_BOT_TOKEN`
+
+Your discord bot token
+
+#### `MCSMANAGER_ADDRESS`
+
+Your MCSManager Panel Address, need contain https, or https
+
+Eg) `https://example.com`
+
+#### `MCSMANAGER_API_KEY`
+
+Your MCSManager apikey. [How to get your MCSM apikey](https://docs.mcsmanager.com/apis/get_apikey.html)
+
+#### `EPHEMERAL_MESSAGE`
+
+Hide bot message for the user who send the message or not
+
+Default `True`
+
+#### `OUT_PUT_SIZE`
+
+The output size for instance, Unit KB
+
+Default `1000`
 
 ## How to create a discord bot and get api?
 1. Go to [Discord Developer Panel](https://discord.com/developers), login your discord account.
