@@ -56,7 +56,7 @@ Your MCSManager apikey. [How to get your MCSM apikey](https://docs.mcsmanager.co
 
 Hide bot message for the user who send the message or not
 
-Default `True`
+Default `False`, use `true` or `1` to adjust this option.
 
 #### `OUT_PUT_SIZE`
 

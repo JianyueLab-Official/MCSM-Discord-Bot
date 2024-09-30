@@ -9,7 +9,7 @@ from scripts import *
 # Load environment variables
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-MESSAGE = os.getenv("EPHEMERAL_MESSAGE")
+MESSAGE: bool = os.getenv("EPHEMERAL_MESSAGE", "False").lower() in ("true", "1")
 
 # Create shortcut
 intents = discord.Intents.all()
