@@ -482,7 +482,7 @@ def function_addNode(ip, port, remarks, daemon_apikey):
 
 def function_deleteNode(daemon_id):
     response = requests.delete(
-        ADDRESS + "/api/service/remote_service?apikey=" + API_KEY + "&daemonId=" + daemon_id,
+        ADDRESS + "/api/service/remote_service?apikey=" + API_KEY + "&uuid=" + daemon_id,
         headers=headers,
     ).json()
 
@@ -512,6 +512,37 @@ def function_tryNode(daemon_id):
             "data": response["data"],
             "message": "Node(Daemon) has been tried."
         }
+        return data_set
+    else:
+        return status
+
+
+def function_updateDaemon(daemon_id, ip, port, remarks, daemon_apikey):
+    request_body = {
+        "uuid": daemon_id,
+        "ip": ip,
+        "port": port,
+        "prefix": "",
+        "available": false,
+        "remarks": remarks,
+        "apiKey": daemon_apikey
+    }
+
+    response = requests.put(
+        ADDRESS + "/api/service/remote_service?apikey=" + API_KEY,
+        json=request_body,
+        headers=headers
+    ).json()
+
+    status = function_statusCheck(response)
+
+    if status is True:
+        data_set = {
+            "status": response["status"],
+            "data": response["data"],
+            "time": response["time"],
+        }
+
         return data_set
     else:
         return status
