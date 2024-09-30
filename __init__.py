@@ -17,7 +17,7 @@ client = commands.Bot(command_prefix='!', intents=intents)
 
 # Version information
 BOT_VERSION = '0.1.1'
-BOT_BUILD_TYPE = 'Dev'
+BOT_BUILD_TYPE = 'Release'
 
 
 # Start Bot
@@ -249,6 +249,32 @@ async def output(interaction: discord.Interaction, instance_name: str):
         print(e)
 
     return
+
+
+"""
+# add node
+@client.tree.command(name="node_add", description="Add a node to your panel")
+async def node_add(interaction: discord.Interaction, ip: str, port: int, remarks: str, daemon_apikey: str):
+    # sending defer message
+    await interaction.response.defer(ephemeral=MESSAGE)
+
+    try:
+        data = function_addNode(ip, port, remarks, daemon_apikey)
+
+        # update dictionary for discord bot
+        function_fetchAllData()
+
+        await interaction.followup.send(f"Daemon successfully added to MCSM Panel | DaemonId {data}")
+
+    except Exception as e:
+        print(e)
+        await interaction.followup.send(f"Error {e}")
+
+    return
+
+
+# user control
+"""
 
 
 # info
