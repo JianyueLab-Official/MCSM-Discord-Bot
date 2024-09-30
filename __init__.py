@@ -9,6 +9,7 @@ from scripts import *
 # Load environment variables
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+MESSAGE = os.getenv("EPHEMERAL_MESSAGE")
 
 # Create shortcut
 intents = discord.Intents.all()
@@ -37,7 +38,7 @@ async def on_ready():
 @client.tree.command(name="update", description="Update the data dict for your web panel.")
 async def update(interaction: discord.Interaction):
     # send defer message, and hide the message only for the person who send the message.
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=MESSAGE)
 
     try:
         function_fetchAllData()
@@ -54,7 +55,7 @@ async def update(interaction: discord.Interaction):
 @client.tree.command(name="overview", description="Get overview of your MCSM panel.")
 async def overview(interaction: discord.Interaction):
     # Send a wait message ("Bot is thinking"), only the sender can see this message.
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=MESSAGE)
     # Get data from script$
     data = function_getOverview()
     # Check status
@@ -99,7 +100,7 @@ async def overview(interaction: discord.Interaction):
 )
 # function
 async def instance(interaction: discord.Interaction, action: app_commands.Choice[int], instance_name: str):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=MESSAGE)
 
     # check if uuid, daemon_id is not none
     try:
@@ -195,7 +196,7 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
 # command [instance name] [command]
 @client.tree.command(name="command", description="Send a command to your instance")
 async def command(interaction: discord.Interaction, instance_name: str, command: str):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=MESSAGE)
 
     # try
     try:
@@ -227,7 +228,7 @@ async def command(interaction: discord.Interaction, instance_name: str, command:
 # Get output
 @client.tree.command(name="output", description="Get output of your instance")
 async def output(interaction: discord.Interaction, instance_name: str):
-    await interaction.response.defer(ephemeral=True)
+    await interaction.response.defer(ephemeral=MESSAGE)
 
     try:
         uuid, daemon_id = function_nameIdTransfer(instance_name)
@@ -269,7 +270,7 @@ async def info(interaction: discord.Interaction):
     embed.set_footer(text="Powered by JianyueLab",
                      icon_url="https://pic.awa.ms/f/1/65ed96d9842a5/65ed96d9842a5.png")
 
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.response.send_message(embed=embed, ephemeral=MESSAGE)
     return
 
 client.run(DISCORD_TOKEN)
