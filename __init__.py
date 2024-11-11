@@ -26,7 +26,7 @@ async def on_ready():
     # Try to sync commands
     try:
         synced = await client.tree.sync()
-        function_fetchAllData()
+        function_fetchDaemonData()
         print(f"Synced {len(synced)} command(s)")
         print('Bot is ready for use!')
     except Exception as e:
@@ -41,7 +41,7 @@ async def update(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=MESSAGE)
 
     try:
-        function_fetchAllData()
+        function_fetchDaemonData()
         await interaction.followup.send("Data Dict Update Successfully")
 
     except Exception as e:
@@ -91,7 +91,7 @@ async def overview(interaction: discord.Interaction):
 @app_commands.choices(
     action=[
         app_commands.Choice(name="Detail", value=0),
-        # app_commands.Choice(name="List", value=1),
+        app_commands.Choice(name="List", value=1),
         app_commands.Choice(name="Start", value=2),
         app_commands.Choice(name="Stop", value=3),
         app_commands.Choice(name="Restart", value=4),
@@ -105,7 +105,7 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
     # check if uuid, daemon_id is not none
     try:
         # exchange instance_name to uuid, and daemon_id
-        uuid, daemon_id = function_nameIdTransfer(instance_name)
+        uuid, daemon_id = function_deamonNameIdTrans(instance_name)
 
         # check action value
         match action.value:
@@ -128,6 +128,8 @@ async def instance(interaction: discord.Interaction, action: app_commands.Choice
 
                 # return Message
                 await interaction.followup.send(embed=embed)
+
+            ## No idea for listing all the instance
 
             # if value is 2 - Start
             case 2:
@@ -251,7 +253,6 @@ async def output(interaction: discord.Interaction, instance_name: str):
     return
 
 
-"""
 # add node
 @client.tree.command(name="node_add", description="Add a node to your panel")
 async def node_add(interaction: discord.Interaction, ip: str, port: int, remarks: str, daemon_apikey: str):
@@ -262,7 +263,7 @@ async def node_add(interaction: discord.Interaction, ip: str, port: int, remarks
         data = function_addNode(ip, port, remarks, daemon_apikey)
 
         # update dictionary for discord bot
-        function_fetchAllData()
+        function_fetchDaemonData()
 
         await interaction.followup.send(f"Daemon successfully added to MCSM Panel | DaemonId {data}")
 
@@ -274,7 +275,44 @@ async def node_add(interaction: discord.Interaction, ip: str, port: int, remarks
 
 
 # user control
-"""
+# create User
+@client.tree.command(name="user_create", description="Create a user")
+@app_commands.choices(
+    permission=[
+        app_commands.Choice(name="Admin", value=10),
+        app_commands.Choice(name="User", value=1),
+        app_commands.Choice(name="Banned", value=-1),
+    ]
+)
+async def create_user(interaction: discord.Interaction, username: str, password: str, permission: app_commands.Choice[int]):
+    await interaction.response.defer(ephemeral=MESSAGE)
+
+    try:
+        function_createUser(username, password, permission.value)
+        await interaction.followup.send(f"User successfully created")
+
+    except Exception as e:
+        error_message = f"Error {e}"
+        await interaction.followup.send(error_message)
+        print(e)
+
+    return
+
+
+# delete user
+@client.tree.command(name="user_delete", description="Delete a user")
+async def delete_user(interaction: discord.Interaction, username: str):
+    await interaction.response.defer(ephemeral=MESSAGE)
+
+    try:
+        # use user name id tran function transfer username to refer uuid, then send to api.
+        function_deleteUser(function_userNameIdTrans(username))
+        await interaction.followup.send(f"User successfully deleted")
+    except Exception as e:
+        await interaction.followup.send(f"Error {e}")
+        print(e)
+
+    return
 
 
 # info

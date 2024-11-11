@@ -20,6 +20,7 @@ PAGE_SIZE_PAGE = f"&page_size={PAGE_SIZE}&page={PAGE}"
 
 instanceData = {}
 daemonData = {}
+userData = {}
 
 
 def function_trueFalseJudge(data):
@@ -89,13 +90,18 @@ def function_instanceStatusCheck(data):
             return "Unknown"
 
 
-def function_nameIdTransfer(instance_name):
+def function_daemonNameIdTrans(instance_name):
     uuid = instanceData[instance_name]["uuid"]
     daemon_id = instanceData[instance_name]["daemonId"]
     return uuid, daemon_id
 
 
-def function_fetchAllData():
+def function_userNameIdTrans(user_name):
+    uuid = userData[user_name]["uuid"]
+    return uuid
+
+
+def function_fetchDaemonData():
     data = requests.get(
         ADDRESS + f"/api/overview?apikey={API_KEY}"
     ).json()
@@ -123,6 +129,22 @@ def function_fetchAllData():
             instanceData[nickname] = {}
             instanceData[nickname]["uuid"] = instance_id
             instanceData[nickname]["daemonId"] = daemon_id
+
+    return
+
+
+def function_fetchUserData():
+    response = requests.get(
+        ADDRESS + "/api/auth/search?apikey=" + API_KEY + "&userName=&role=&" + PAGE_SIZE_PAGE,
+        headers=headers
+    ).json()
+
+    users = response["data"]["data"]
+
+    for user in users:
+        userName = user["userName"]
+        userId = user["uuid"]
+        userData[userName] = userId
 
     return
 
