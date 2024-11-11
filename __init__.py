@@ -27,6 +27,7 @@ async def on_ready():
     try:
         synced = await client.tree.sync()
         function_fetchDaemonData()
+        function_fetchUserData()
         print(f"Synced {len(synced)} command(s)")
         print('Bot is ready for use!')
     except Exception as e:
@@ -42,6 +43,7 @@ async def update(interaction: discord.Interaction):
 
     try:
         function_fetchDaemonData()
+        function_fetchUserData()
         await interaction.followup.send("Data Dict Update Successfully")
 
     except Exception as e:
