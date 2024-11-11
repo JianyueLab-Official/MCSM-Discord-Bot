@@ -4,9 +4,9 @@
 
 ### TO DO LIST:
 
-- [ ] Instance List
-- [ ] User Control
-- [ ] Node Control & Details
+- [ ] Instance List & Update
+- [ ] User List & Update
+- [ ] Node List & Update & Detail
 - [ ] User search
 - [ ] etc.
 
