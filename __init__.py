@@ -276,6 +276,39 @@ async def node_add(interaction: discord.Interaction, ip: str, port: int, remarks
     return
 
 
+@client.tree.command(name="node")
+@app_commands.choices(
+    action=[
+        app_commands.Choice(name="Delete", value=0),
+        app_commands.Choice(name="Reconnect", value=1),
+    ]
+)
+async def node(interaction: discord.Interaction, action: app_commands.Choice, daemonName: str):
+    await interaction.response.defer(ephemeral=MESSAGE)
+
+    match action.value:
+        case 0:
+            try:
+                function_deleteNode(function_daemonNameIdTrans(daemonName))
+                await interaction.followup.send("Node successfully deleted.")
+            except Exception as e:
+                print(e)
+                await interaction.followup.send(f"Error {e}")
+
+        case 1:
+            try:
+                function_tryNode(function_daemonNameIdTrans(daemonName))
+                await interaction.followup.send("Node successfully connected.")
+            except Exception as e:
+                print(e)
+                await interaction.followup.send(f"Error {e}")
+
+        case _:
+            await interaction.followup.send(f"Invalid Input")
+
+    return
+
+
 # user control
 # create User
 @client.tree.command(name="user_create", description="Create a user")
@@ -307,7 +340,7 @@ async def delete_user(interaction: discord.Interaction, username: str):
     await interaction.response.defer(ephemeral=MESSAGE)
 
     try:
-        # use user name id tran function transfer username to refer uuid, then send to api.
+        # use username id tran function transfer username to refer uuid, then send to api.
         function_deleteUser(function_userNameIdTrans(username))
         await interaction.followup.send(f"User successfully deleted")
     except Exception as e:
