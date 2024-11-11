@@ -101,6 +101,11 @@ def function_userNameIdTrans(user_name):
     return uuid
 
 
+def function_nodeNameIdTrans(node_name):
+    daemonId = daemonData[node_name]
+    return daemonId
+
+
 def function_fetchDaemonData():
     data = requests.get(
         ADDRESS + f"/api/overview?apikey={API_KEY}"
