@@ -17,7 +17,7 @@ client = commands.Bot(command_prefix='!', intents=intents)
 
 # Version information
 BOT_VERSION = '0.1.1'
-BOT_BUILD_TYPE = 'Release'
+BOT_BUILD_TYPE = 'BETA'
 
 
 # Start Bot
