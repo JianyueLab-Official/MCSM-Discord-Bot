@@ -4,7 +4,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-from scripts import *
+from user import *
+from utils import *
+from daemon import *
+from instance import *
 
 # Load environment variables
 load_dotenv()

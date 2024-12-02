@@ -28,7 +28,7 @@ pip3 install -r requirements.txt
 // if install failed please use this command to manually install the requirements
 pip3 install python-dotenv discord.py requests
 
-python __init__.py
+python src/__init__.py
 ```
 
 - Copy `.env.sample` to `.env` and fill all the blanks.
